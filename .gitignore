@@ -1,0 +1,9 @@
+.vs
+*.sln
+WindowsNoEditor/
+Intermediate/
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/

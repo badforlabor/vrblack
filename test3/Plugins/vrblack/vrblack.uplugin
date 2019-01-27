@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "vrblack",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "labor",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "vrblack",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

@@ -1,0 +1,21 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{3B593CAD-4B03-56B7-456D-C99B037B8DF4}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "test3",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"TimeManagement",
+				"Engine"
+			]
+		}
+	],
+	"TargetPlatforms": [
+		"PS4",
+		"WindowsNoEditor"
+	]
+}
