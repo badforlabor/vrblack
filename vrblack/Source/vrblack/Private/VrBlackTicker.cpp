@@ -1,8 +1,8 @@
 #include "VrBlackTicker.h"
 
 #include "TickableObjectRenderThread.h"
-#include "IXRTrackingSystem.h"
-#include "IHeadMountedDisplay.h"
+//#include "IXRTrackingSystem.h"
+//#include "IHeadMountedDisplay.h"
 #include "openvr.h"
 #include "VrBlackPrivate.h"
 #include "Rendercore.h"

@@ -34,7 +34,7 @@ public class vrblack : ModuleRules
                     "RHI",
                     "RenderCore",
 				// ... add other public dependencies that you statically link with here ...
-                "HeadMountedDisplay",
+                //"HeadMountedDisplay",
             }
 			);
 			
@@ -66,9 +66,9 @@ public class vrblack : ModuleRules
             PublicDependencyModuleNames.AddRange(
                 new string[]
                 {
-            "SteamVR",
+            //"SteamVR",
             "OpenVR",
-            "SteamVRController"
+            //"SteamVRController"
                 });
         }
     }
