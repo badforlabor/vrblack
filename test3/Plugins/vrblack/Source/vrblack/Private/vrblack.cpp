@@ -10,6 +10,7 @@ DEFINE_LOG_CATEGORY(LogVrBlack);
 
 
 TSharedPtr<FVrBlackTicker>	SplashTicker = NULL;
+TSharedPtr<FVrBlackTickerManual>	ManualSplashTicker = NULL;
 
 extern void RegBlack(UTexture* Texture)
 {
@@ -19,6 +20,22 @@ extern void RegBlack(UTexture* Texture)
 		SplashTicker->Init();
 	}
 	SplashTicker->Texture = Texture;
+}
+extern void EnableManualBlack(class UWorld* World, UTexture* Texture)
+{
+	if (!ManualSplashTicker.IsValid())
+	{
+		ManualSplashTicker = MakeShareable(new FVrBlackTickerManual());
+		ManualSplashTicker->Init();
+	}
+	ManualSplashTicker->BeginBlack(Texture, World);
+}
+extern void DisableManualBlack(class UWorld* World)
+{
+	if (ManualSplashTicker.IsValid())
+	{
+		ManualSplashTicker->EndBlack(World);
+	}
 }
 
 void FvrblackModule::StartupModule()
@@ -36,6 +53,11 @@ void FvrblackModule::ShutdownModule()
 	{
 		SplashTicker->OnDestroy();
 		SplashTicker = NULL;
+	}
+	if (ManualSplashTicker.IsValid())
+	{
+		ManualSplashTicker->OnDestroy();
+		ManualSplashTicker = NULL;
 	}
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.

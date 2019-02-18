@@ -133,3 +133,62 @@ void FVrBlackTicker::Tick(float DeltaTime)
 		RenderTargetTexture->Release();
 	}
 }
+
+FVrBlackTickerManual::FVrBlackTickerManual()
+	:FVrBlackTicker()
+{
+	Counter = 0;
+}
+
+void FVrBlackTickerManual::Init()
+{
+	Counter = 0;
+	Texture = NULL;
+}
+void FVrBlackTickerManual::BeginBlack(UTexture* InTexture, class UWorld* World)
+{
+	if (!InTexture)
+	{
+		return;
+	}
+
+	if (Counter == 0)
+	{
+		APlayerController* playerController = World->GetFirstPlayerController();
+		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(playerController->Player);
+		LocalPlayer->ViewportClient->EngineShowFlags.Rendering = 0;
+		World->GetGameViewport()->bDisableWorldRendering = true;
+
+		//Texture->GetWorld()->GetGameViewport()->bDisableWorldRendering = true;
+		Texture = InTexture;
+		Texture->AddToRoot();
+		OnPreLoadMap("");
+	}
+
+	Counter++;
+}
+void FVrBlackTickerManual::EndBlack(class UWorld* World)
+{
+	if (Counter <= 0)
+	{
+		return;
+	}
+
+	Counter--;
+
+	if (Counter == 0)
+	{
+		APlayerController* playerController = World->GetFirstPlayerController();
+		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(playerController->Player);
+		LocalPlayer->ViewportClient->EngineShowFlags.Rendering = 1;
+		World->GetGameViewport()->bDisableWorldRendering = false;
+
+		OnPostLoadMap(NULL);
+		if (Texture)
+		{
+			//Texture->GetWorld()->GetGameViewport()->bDisableWorldRendering = false;
+			Texture->RemoveFromRoot();
+		}
+		Texture = NULL;
+	}
+}
