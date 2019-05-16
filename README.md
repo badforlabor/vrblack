@@ -19,4 +19,4 @@
 
 ### 注意
 
-- UE4.20中，测试了一下SetSplashScreen，有bug，会崩溃。需要手动改下UE4的源码才能解决。
+- UE4.20中，测试了一下UE4自带的SetSplashScreen，有bug，会崩溃。需要手动改下UE4的源码才能解决。
