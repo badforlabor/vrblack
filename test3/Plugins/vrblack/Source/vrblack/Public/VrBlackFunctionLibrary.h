@@ -18,4 +18,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		static void BeforeOpenLevel(class UTexture* Texture);	
 	
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+		static void ManualDisableRender(const UObject* WorldContextObject, class UTexture* Texture);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+		static void ManualEnableRender(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable)
+		static void MySleep(float t);
 };

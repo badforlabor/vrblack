@@ -24,13 +24,28 @@ public:
 	virtual bool IsTickable() const override;
 
 public:
-	void Init();
+	virtual void Init();
 	void OnDestroy();
 	class UTexture* Texture;
 
-private:
+protected:
 	void RegisterForMapLoad();
 	void UnregisterForMapLoad();
 	void OnPreLoadMap(const FString&);
 	void OnPostLoadMap(UWorld*);
 };
+
+// 主动模式
+class FVrBlackTickerManual : public FVrBlackTicker
+{
+public:
+	FVrBlackTickerManual();
+
+	virtual void Init() override;
+	void BeginBlack(UTexture* InTexture, class UWorld*);
+	void EndBlack(class UWorld*);
+
+private:
+	int Counter;
+};
+
