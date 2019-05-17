@@ -316,18 +316,15 @@ void FVrBlackTickerManual::EndBlack(class UWorld* World)
 }
 
 /**************************************************************************/
-/* overlay                                                              */
+/* 用overlay制作黑色遮罩                                                  */
 /**************************************************************************/
-struct FBPOpenVRKeyboardHandle
+struct FVrBlackOverlayHandle
 {
-	//GENERATED_BODY()
 public:
-
 	uint64_t VRKeyboardHandle;
 
-	FBPOpenVRKeyboardHandle()
+	FVrBlackOverlayHandle()
 	{
-		//static const VROverlayHandle_t k_ulOverlayHandleInvalid = 0;	
 		VRKeyboardHandle = vr::k_ulOverlayHandleInvalid;
 	}
 	const bool IsValid()
@@ -335,15 +332,13 @@ public:
 		return VRKeyboardHandle != vr::k_ulOverlayHandleInvalid;
 	}
 
-	//This is here for the Find() and Remove() functions from TArray
-	FORCEINLINE bool operator==(const FBPOpenVRKeyboardHandle &Other) const
+	FORCEINLINE bool operator==(const FVrBlackOverlayHandle &Other) const
 	{
 		if (VRKeyboardHandle == Other.VRKeyboardHandle)
 			return true;
 
 		return false;
 	}
-	//#define INVALID_TRACKED_CAMERA_HANDLE
 };
 
 static vr::HmdMatrix34_t ToHmdMatrix34(const FMatrix& tm)
@@ -384,11 +379,11 @@ static void TransformToSteamSpace(const FTransform& In, vr::HmdMatrix34_t& Out, 
 	Out = ToHmdMatrix34(FTransform(OutRot, OutPos, OutScale).ToMatrixWithScale());
 }
 
-static FBPOpenVRKeyboardHandle KeyboardHandle1;
-static FBPOpenVRKeyboardHandle KeyboardHandle2;
-static FBPOpenVRKeyboardHandle KeyboardHandle3;
-static FBPOpenVRKeyboardHandle KeyboardHandle4;
-void ShowOverlay(UTexture * tex, FBPOpenVRKeyboardHandle& KeyboardHandle, FVector pos)
+static FVrBlackOverlayHandle KeyboardHandle1;
+static FVrBlackOverlayHandle KeyboardHandle2;
+static FVrBlackOverlayHandle KeyboardHandle3;
+static FVrBlackOverlayHandle KeyboardHandle4;
+void ShowOverlay(UTexture * tex, FVrBlackOverlayHandle& KeyboardHandle, FVector pos)
 {
 	if (KeyboardHandle.IsValid())
 	{
@@ -396,7 +391,6 @@ void ShowOverlay(UTexture * tex, FBPOpenVRKeyboardHandle& KeyboardHandle, FVecto
 	}
 
 	vr::HmdError HmdErr;
-	//vr::IVROverlay * VROverlay = (vr::IVROverlay*)(*UOpenVRExpansionFunctionLibrary::VRGetGenericInterfaceFn)(vr::IVROverlay_Version, &HmdErr);
 	vr::IVROverlay * VROverlay = (vr::IVROverlay*)vr::VR_GetGenericInterface(vr::IVROverlay_Version, &HmdErr);
 	if (!VROverlay)
 	{
@@ -404,7 +398,7 @@ void ShowOverlay(UTexture * tex, FBPOpenVRKeyboardHandle& KeyboardHandle, FVecto
 	}
 
 	vr::EVROverlayError OverlayError;
-	OverlayError = VROverlay->CreateOverlay("KeyboardOverlay", "Keyboard Overlay", &KeyboardHandle.VRKeyboardHandle);
+	OverlayError = VROverlay->CreateOverlay("VrBlackOverlay", "VrBlack Overlay", &KeyboardHandle.VRKeyboardHandle);
 
 	if (OverlayError != vr::EVROverlayError::VROverlayError_None || !KeyboardHandle.IsValid())
 	{
@@ -426,7 +420,7 @@ void ShowOverlay(UTexture * tex, FBPOpenVRKeyboardHandle& KeyboardHandle, FVecto
 
 	VROverlay->ShowOverlay(KeyboardHandle.VRKeyboardHandle);
 }
-void HideOverlay(FBPOpenVRKeyboardHandle& KeyboardHandle)
+void HideOverlay(FVrBlackOverlayHandle& KeyboardHandle)
 {
 	if (!KeyboardHandle.IsValid())
 	{
@@ -434,7 +428,6 @@ void HideOverlay(FBPOpenVRKeyboardHandle& KeyboardHandle)
 	}
 
 	vr::HmdError HmdErr;
-	//vr::IVROverlay * VROverlay = (vr::IVROverlay*)(*UOpenVRExpansionFunctionLibrary::VRGetGenericInterfaceFn)(vr::IVROverlay_Version, &HmdErr);
 	vr::IVROverlay * VROverlay = (vr::IVROverlay*)vr::VR_GetGenericInterface(vr::IVROverlay_Version, &HmdErr);
 	if (!VROverlay)
 	{
@@ -442,6 +435,23 @@ void HideOverlay(FBPOpenVRKeyboardHandle& KeyboardHandle)
 	}
 
 	VROverlay->HideOverlay(KeyboardHandle.VRKeyboardHandle);
+}
+void DestroyOverlay(FVrBlackOverlayHandle& VrblackOverlayHandle)
+{
+	if (!VrblackOverlayHandle.IsValid())
+	{
+		return;
+	}
+
+	vr::HmdError HmdErr;
+	vr::IVROverlay * VROverlay = (vr::IVROverlay*)vr::VR_GetGenericInterface(vr::IVROverlay_Version, &HmdErr);
+	if (!VROverlay)
+	{
+		return;
+	}
+
+	VROverlay->DestroyOverlay(VrblackOverlayHandle.VRKeyboardHandle);
+	VrblackOverlayHandle.VRKeyboardHandle = vr::k_ulOverlayHandleInvalid;
 }
 void ShowOverlay(UTexture * tex)
 {
@@ -457,4 +467,90 @@ void HideOverlay()
 	HideOverlay(KeyboardHandle2);
 	HideOverlay(KeyboardHandle3);
 	HideOverlay(KeyboardHandle4);
+}
+void DestroyOverlay()
+{
+	DestroyOverlay(KeyboardHandle1);
+	DestroyOverlay(KeyboardHandle2);
+	DestroyOverlay(KeyboardHandle3);
+	DestroyOverlay(KeyboardHandle4);
+}
+
+FVrBlackAuto::FVrBlackAuto()
+{
+	bInitialized = false;
+	bAuto = false;
+	Texture = NULL;
+}
+
+void FVrBlackAuto::Init()
+{
+	FCoreUObjectDelegates::PreLoadMap.AddRaw(this, &FVrBlackAuto::OnPreLoadMap);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddRaw(this, &FVrBlackAuto::OnPostLoadMap);
+}
+void FVrBlackAuto::Destroy()
+{
+	FCoreUObjectDelegates::PreLoadMap.RemoveAll(this);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+	SetTexture(NULL);
+	DestroyOverlay();
+}
+void FVrBlackAuto::SetTexture(class UTexture* InTexture)
+{
+	if (Texture)
+	{
+		Texture->RemoveFromRoot();
+		Texture = NULL;
+	}
+	if (InTexture)
+	{
+		Texture = InTexture;
+		Texture->AddToRoot();
+	}
+}
+
+void FVrBlackAuto::SetEnableAuto(class UTexture* InTexture, bool b)
+{
+	bAuto = b;
+	if (InTexture)
+	{
+		SetTexture(InTexture);
+	}
+}
+void FVrBlackAuto::DoBlack(class UTexture* InTexture, bool b)
+{
+	if (InTexture)
+	{
+		SetTexture(InTexture);
+	}
+	DoAction(b);
+}
+void FVrBlackAuto::OnPreLoadMap(const FString&)
+{
+	if (bAuto)
+	{
+		DoAction(true);
+	}
+}
+void FVrBlackAuto::OnPostLoadMap(UWorld*)
+{
+	if (bAuto)
+	{
+		DoAction(false);
+	}
+}
+void FVrBlackAuto::DoAction(bool b)
+{
+	if (b)
+	{
+		if (Texture)
+		{
+			SetSkyboxOverride(Texture, Texture, Texture, Texture, Texture, Texture);
+			ShowOverlay(Texture);
+		}
+	}
+	else
+	{
+		HideOverlay();
+	}
 }

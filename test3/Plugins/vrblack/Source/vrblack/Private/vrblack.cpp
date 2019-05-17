@@ -38,10 +38,24 @@ extern void DisableManualBlack(class UWorld* World)
 	}
 }
 
+static FVrBlackAuto AutoVrBlack;
+extern void EnableAutoVrBlack(UTexture* Texture, bool Auto)
+{
+	AutoVrBlack.SetEnableAuto(Texture, Auto);
+}
+extern void EnableVrBlack(UTexture* Texture)
+{
+	AutoVrBlack.DoBlack(Texture, true);
+}
+extern void DisableVrBlack()
+{
+	AutoVrBlack.DoBlack(NULL, false);
+}
+
 void FvrblackModule::StartupModule()
 {
 	UE_LOG(LogVrBlack, Display, TEXT("FvrblackModule::StartupModule"));
-
+	AutoVrBlack.Init();
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
@@ -59,6 +73,7 @@ void FvrblackModule::ShutdownModule()
 		ManualSplashTicker->OnDestroy();
 		ManualSplashTicker = NULL;
 	}
+	AutoVrBlack.Destroy();
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 }

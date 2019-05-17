@@ -5,36 +5,60 @@
 #include "Engine/Texture.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 
+extern void EnableAutoVrBlack(UTexture* Texture, bool Auto);
+extern void EnableVrBlack(UTexture* Texture);
+extern void DisableVrBlack();
+
 void UVrBlackFunctionLibrary::BeforeOpenLevel(class UTexture* Texture)
 {
-	if (!Texture)
-	{
-		return;
-	}
+	EnableAutoVrBlack(Texture, true);
+	//if (!Texture)
+	//{
+	//	return;
+	//}
 
-	Texture->AddToRoot();
+	//Texture->AddToRoot();
 
-	extern void RegBlack(UTexture* Texture);
-	RegBlack(Texture);
+	//extern void RegBlack(UTexture* Texture);
+	//RegBlack(Texture);
 }
 
+void UVrBlackFunctionLibrary::EnableAutoBlack(class UTexture* Texture)
+{
+	EnableAutoVrBlack(Texture, true);
+}
+
+void UVrBlackFunctionLibrary::DisableAutoBlack()
+{
+	EnableAutoVrBlack(NULL, false);
+}
+void UVrBlackFunctionLibrary::EnableVrBlack(class UTexture* Texture)
+{
+	::EnableVrBlack(Texture);
+}
+void UVrBlackFunctionLibrary::DisableVrBlack()
+{
+	::DisableVrBlack();
+}
 
 void UVrBlackFunctionLibrary::ManualDisableRender(const UObject* WorldContextObject, class UTexture* Texture)
 {
-	if (!Texture)
-	{
-		return;
-	}
+	EnableVrBlack(Texture);
+	//if (!Texture)
+	//{
+	//	return;
+	//}
 
-	extern void EnableManualBlack(class UWorld* World, UTexture* Texture);
-	EnableManualBlack(WorldContextObject->GetWorld(), Texture);
+	//extern void EnableManualBlack(class UWorld* World, UTexture* Texture);
+	//EnableManualBlack(WorldContextObject->GetWorld(), Texture);
 
 	//UHeadMountedDisplayFunctionLibrary::EnableHMD(false);
 }
 void UVrBlackFunctionLibrary::ManualEnableRender(const UObject* WorldContextObject)
 {
-	extern void DisableManualBlack(class UWorld* World);
-	DisableManualBlack(WorldContextObject->GetWorld());
+	DisableVrBlack();
+	//extern void DisableManualBlack(class UWorld* World);
+	//DisableManualBlack(WorldContextObject->GetWorld());
 
 	//UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 }

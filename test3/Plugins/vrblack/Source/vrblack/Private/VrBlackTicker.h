@@ -49,3 +49,21 @@ private:
 	int Counter;
 };
 
+class FVrBlackAuto
+{
+public:
+	FVrBlackAuto();
+	void Init();
+	void SetEnableAuto(class UTexture* InTexture, bool b);
+	void Destroy();
+	void DoBlack(class UTexture* InTexture, bool b);
+private:
+	void OnPreLoadMap(const FString&);
+	void OnPostLoadMap(UWorld*);
+	void DoAction(bool b);
+	void SetTexture(class UTexture* InTexture);
+private:
+	bool bAuto;
+	bool bInitialized;
+	class UTexture* Texture;
+};
