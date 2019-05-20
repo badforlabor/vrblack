@@ -316,7 +316,7 @@ void FVrBlackTickerManual::EndBlack(class UWorld* World)
 }
 
 /**************************************************************************/
-/* 用overlay制作黑色遮罩                                                  */
+/* 鐢╫verlay鍒朵綔榛戣壊閬僵                                                  */
 /**************************************************************************/
 struct FVrBlackOverlayHandle
 {
@@ -385,11 +385,6 @@ static FVrBlackOverlayHandle KeyboardHandle3;
 static FVrBlackOverlayHandle KeyboardHandle4;
 void ShowOverlay(UTexture * tex, FVrBlackOverlayHandle& KeyboardHandle, FVector pos)
 {
-	if (KeyboardHandle.IsValid())
-	{
-		return;
-	}
-
 	vr::HmdError HmdErr;
 	vr::IVROverlay * VROverlay = (vr::IVROverlay*)vr::VR_GetGenericInterface(vr::IVROverlay_Version, &HmdErr);
 	if (!VROverlay)
@@ -397,13 +392,16 @@ void ShowOverlay(UTexture * tex, FVrBlackOverlayHandle& KeyboardHandle, FVector 
 		return;
 	}
 
-	vr::EVROverlayError OverlayError;
-	OverlayError = VROverlay->CreateOverlay("VrBlackOverlay", "VrBlack Overlay", &KeyboardHandle.VRKeyboardHandle);
-
-	if (OverlayError != vr::EVROverlayError::VROverlayError_None || !KeyboardHandle.IsValid())
+	if (!KeyboardHandle.IsValid())
 	{
-		KeyboardHandle.VRKeyboardHandle = vr::k_ulOverlayHandleInvalid;
-		return;
+		vr::EVROverlayError OverlayError;
+		OverlayError = VROverlay->CreateOverlay("VrBlackOverlay", "VrBlack Overlay", &KeyboardHandle.VRKeyboardHandle);
+
+		if (OverlayError != vr::EVROverlayError::VROverlayError_None || !KeyboardHandle.IsValid())
+		{
+			KeyboardHandle.VRKeyboardHandle = vr::k_ulOverlayHandleInvalid;
+			return;
+		}
 	}
 
 
